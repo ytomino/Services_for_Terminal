@@ -110,7 +110,7 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 
 	// run AppleScript
 	NSDictionary* errors;
-#if 0
+#if 1
 	NSBundle *mainBundle = [NSBundle mainBundle];
 	NSString *scriptPath = [mainBundle
 		pathForResource:@"editSelectedFileInTerminal"
@@ -127,11 +127,20 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 		return;
 	}
 	
+	NSLog(@"%s:%d %@", __FILE__, __LINE__, [appleScript source]);
+
 	if(![appleScript compileAndReturnError:&errors]){
 		NSLog(@"%s:%d %@", __FILE__, __LINE__, errors);
 		return;
 	}
 	
+	NSAppleEventDescriptor *result;
+#if 0
+	result = [appleScript executeAndReturnError:&errors];
+	NSLog(@"%s:%d %@", __FILE__, __LINE__, result);
+	NSLog(@"%s:%d %@", __FILE__, __LINE__, errors);
+#endif
+
 	// create the first parameter
 	NSAppleEventDescriptor *input = [NSAppleEventDescriptor
 		descriptorWithString:filename];
@@ -155,23 +164,27 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 	// create an NSAppleEventDescriptor with the script's method name to call,
 	// this is used for the script statement: "on show_message(user_message)"
 	// Note that the routine name must be in lower case.
+#if 0
 	NSAppleEventDescriptor *handler = [NSAppleEventDescriptor
 		descriptorWithString:@"run"];
+#endif
 
 	// create the event for an AppleScript subroutine,
 	// set the method name and the list of parameters
 	NSAppleEventDescriptor *event = [NSAppleEventDescriptor
-		appleEventWithEventClass:kASAppleScriptSuite //kCoreEventClass //'cplG'
-		eventID:kASSubroutineEvent
+		appleEventWithEventClass:kCoreEventClass //kASSubroutineEvent //kASAppleScriptSuite //'cplG'
+		eventID:kAEOpenApplication //kASSubroutineEvent
 		targetDescriptor:nil //target
 		returnID:kAutoGenerateReturnID
 		transactionID:kAnyTransactionID];
+#if 0
 	[event setParamDescriptor:handler forKeyword:keyASSubroutineName];
+#endif
 	[event setParamDescriptor:args forKeyword:keyDirectObject];
 
 	NSLog(@"%s:%d %@", __FILE__, __LINE__, event);
 
-	NSAppleEventDescriptor *result = [appleScript
+	result = [appleScript
 		executeAppleEvent:event
 		error:&errors];
 	NSLog(@"%s:%d %@", __FILE__, __LINE__, result);
