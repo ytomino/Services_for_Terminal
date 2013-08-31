@@ -9,7 +9,7 @@ on run {input, parameters}
 	-- display dialog filename
 	if filename ≠ "" then
 		
-		set cmd to "edit " & filename
+		set cmd to "edit " & quoted form of filename
 		
 		tell application "Terminal"
 			do script cmd in front tab of front window
