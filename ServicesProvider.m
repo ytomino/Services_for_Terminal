@@ -86,25 +86,46 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 	// extract a filename
 	
 	NSString *filename = pasteboardString;
+	NSUInteger length = [filename length];
+	NSUInteger from = 0;
+	NSUInteger to = length;
+	
+	// skip git status, /\t[a-z]+:   /
+	while(from < length && [filename characterAtIndex:from] == '\t'){
+		++from;
+	}
+	if(from == 1){
+		NSUInteger i = from;
+		while(i < length && islower([filename characterAtIndex:i])){
+			++i;
+		}
+		if(i >= 2 && i < length && [filename characterAtIndex:i] == ':'){
+			++i;
+			while(i < length && [filename characterAtIndex:i] == ' '){
+				++i;
+			}
+			from = i;
+		}
+	}
 	
 	int colon_count = 0;
-	NSUInteger length = [filename length];
-	for(NSUInteger i = 0; i < length; ++i){
+	for(NSUInteger i = from; i < length; ++i){
 		unichar c = [filename characterAtIndex:i];
 		if(c == ':'){
 			++colon_count;
 			if(colon_count == 2){
-				filename = [filename substringToIndex:i];
+				to = i;
 				break;
 			}
 		}else if(colon_count >= 1 && c == ' '){
-			filename = [filename substringToIndex:i];
+			to = i;
 			break;
 		}else if(c == '\n'){
-			filename = [filename substringToIndex:i]; // strip after '\n'
+			to = i; // strip after '\n'
 			break;
 		}
 	}
+	filename = [filename substringWithRange:NSMakeRange(from, to - from)];
 	
 	NSLog(@"%s:%d \"%@\"", __FILE__, __LINE__, filename);
 
