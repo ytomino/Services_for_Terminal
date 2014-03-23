@@ -89,6 +89,7 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 	NSUInteger length = [filename length];
 	NSUInteger from = 0;
 	NSUInteger to = length;
+	bool has_git_header = false;
 	
 	// skip git status, /\t[a-z]+:   /
 	while(from < length && [filename characterAtIndex:from] == '\t'){
@@ -96,7 +97,8 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 	}
 	if(from == 1){
 		NSUInteger i = from;
-		while(i < length && islower([filename characterAtIndex:i])){
+		unichar c;
+		while(i < length && (c = [filename characterAtIndex:i], islower(c) || c == ' ')){
 			++i;
 		}
 		if(i >= 2 && i < length && [filename characterAtIndex:i] == ':'){
@@ -105,19 +107,20 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 				++i;
 			}
 			from = i;
+			has_git_header = true;
 		}
 	}
 	
 	int colon_count = 0;
 	for(NSUInteger i = from; i < length; ++i){
 		unichar c = [filename characterAtIndex:i];
-		if(c == ':'){
+		if(!has_git_header && c == ':'){
 			++colon_count;
 			if(colon_count == 2){
 				to = i;
 				break;
 			}
-		}else if(colon_count >= 1 && c == ' '){
+		}else if(!has_git_header && colon_count >= 1 && c == ' '){
 			to = i;
 			break;
 		}else if(c == '\n'){
