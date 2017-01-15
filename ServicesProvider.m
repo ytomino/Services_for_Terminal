@@ -181,6 +181,11 @@ get_filename: ;
 					withString:@":"];
 			}
 			break;
+		}else if(c == '.' || c == '/'){
+			colon_i = -1;
+			colon_count = 0;
+			hyphen_i = -1;
+			hyphen_count = 0;
 		}else if(c == '\n'){
 			to = i; // strip after '\n'
 			break;
