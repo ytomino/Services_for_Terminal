@@ -96,13 +96,13 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 		NSInteger i = 0;
 		bool has_status = false;
 		unichar c = [filename characterAtIndex:i];
-		if(c == ' ' || (c >= 'A' && c <= 'Z')){
+		if(c == ' ' || c == '?' || (c >= 'A' && c <= 'Z')){
 			++ i;
-			has_status |= (c >= 'A' && c <= 'Z');
+			has_status |= c != ' ';
 			c = [filename characterAtIndex:i];
-			if(c == ' ' || (c >= 'A' && c <= 'Z')){
+			if(c == ' ' || c == '?' || (c >= 'A' && c <= 'Z')){
 				++ i;
-				has_status |= (c >= 'A' && c <= 'Z');
+				has_status |= c != ' ';
 				c = [filename characterAtIndex:i];
 				if(c == ' ' && has_status){
 					++ i;
