@@ -141,17 +141,45 @@ static NSTimeInterval const lifetime = 60.0f; // lifetime
 	}
 	
 get_filename: ;
+	NSInteger colon_i = -1;
 	int colon_count = 0;
+	NSInteger hyphen_i = -1;
+	int hyphen_count = 0;
 	for(NSUInteger i = from; i < length; ++i){
 		unichar c = [filename characterAtIndex:i];
 		if(!has_git_header && c == ':'){
 			++colon_count;
 			if(colon_count == 2){
-				to = i;
+				to = i; // /(.*:.*): /
 				break;
 			}
+			colon_i = i;
+		}else if(!has_git_header && c == '-'){
+			++hyphen_count;
+			if(hyphen_count == 2){
+				to = i; // /(.*-.*)- /
+				filename = [filename
+					stringByReplacingCharactersInRange:NSMakeRange(hyphen_i, 1)
+					withString:@":"];
+				break;
+			}
+			hyphen_i = i;
 		}else if(!has_git_header && colon_count >= 1 && c == ' '){
-			to = i;
+			if(i == (NSUInteger)colon_i + 1){
+				to = colon_i; // /(.*): /
+			}else{
+				to = i; // /(.*:.*) /
+			}
+			break;
+		}else if(!has_git_header && hyphen_count >= 1 && c == ' '){
+			if(i == (NSUInteger)hyphen_i + 1){
+				to = hyphen_i; // /(.*)- /
+			}else{
+				to = i; // /(.*-.*) /
+				filename = [filename
+					stringByReplacingCharactersInRange:NSMakeRange(hyphen_i, 1)
+					withString:@":"];
+			}
 			break;
 		}else if(c == '\n'){
 			to = i; // strip after '\n'
