@@ -181,14 +181,14 @@ get_filename: ;
 					withString:@":"];
 			}
 			break;
-		}else if(c == '.' || c == '/'){
+		}else if(c == '\n'){
+			to = i; // strip after '\n'
+			break;
+		}else if(c < '0' || c > '9'){ // c == '.' || c == '/'
 			colon_i = -1;
 			colon_count = 0;
 			hyphen_i = -1;
 			hyphen_count = 0;
-		}else if(c == '\n'){
-			to = i; // strip after '\n'
-			break;
 		}
 	}
 	filename = [filename substringWithRange:NSMakeRange(from, to - from)];
