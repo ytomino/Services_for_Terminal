@@ -164,14 +164,14 @@ get_filename: ;
 				break;
 			}
 			hyphen_i = i;
-		}else if(!has_git_header && colon_count >= 1 && c == ' '){
+		}else if(!has_git_header && colon_count >= 1 && (c == ' ' || c == '\t')){
 			if(i == (NSUInteger)colon_i + 1){
 				to = colon_i; // /(.*): /
 			}else{
 				to = i; // /(.*:.*) /
 			}
 			break;
-		}else if(!has_git_header && hyphen_count >= 1 && c == ' '){
+		}else if(!has_git_header && hyphen_count >= 1 && (c == ' ' || c == '\t')){
 			if(i == (NSUInteger)hyphen_i + 1){
 				to = hyphen_i; // /(.*)- /
 			}else{
