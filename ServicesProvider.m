@@ -197,6 +197,8 @@ get_filename: ;
 
 	// run AppleScript
 	NSDictionary* errors;
+	errors = [[[NSDictionary alloc] init] autorelease];
+	
 #if 1
 	NSBundle *mainBundle = [NSBundle mainBundle];
 	NSString *scriptPath = [mainBundle
