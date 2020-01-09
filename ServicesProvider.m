@@ -199,7 +199,6 @@ get_filename: ;
 	NSDictionary* errors;
 	errors = [[[NSDictionary alloc] init] autorelease];
 	
-#if 1
 	NSBundle *mainBundle = [NSBundle mainBundle];
 	NSString *scriptPath = [mainBundle
 		pathForResource:@"editSelectedFileInTerminal"
@@ -224,11 +223,6 @@ get_filename: ;
 	}
 	
 	NSAppleEventDescriptor *result;
-#if 0
-	result = [appleScript executeAndReturnError:&errors];
-	NSLog(@"%s:%d %@", __FILE__, __LINE__, result);
-	NSLog(@"%s:%d %@", __FILE__, __LINE__, errors);
-#endif
 
 	// create the first parameter
 	NSAppleEventDescriptor *input = [NSAppleEventDescriptor
@@ -278,33 +272,6 @@ get_filename: ;
 		error:&errors];
 	NSLog(@"%s:%d %@", __FILE__, __LINE__, result);
 	NSLog(@"%s:%d %@", __FILE__, __LINE__, errors);
-#else
-	// create AppleScript in here
-	NSString *escapedFilename = [filename
-		stringByReplacingOccurrencesOfString:@"\""
-		withString:@"\\\""];
-		
-	NSMutableString *source = [[[NSMutableString alloc] init] autorelease];
-	[source appendFormat:@"set filename to \"%@\"\n", escapedFilename];
-	[source appendString:@"set cmd to \"edit \" & quoted form of filename\n"];
-	[source appendString:@"tell application \"Terminal\"\n"];
-	[source appendString:@"\tdo script cmd in front tab of front window\n"];
-	[source appendString:@"end tell\n"];
-
-	NSLog(@"%s:%d %@", __FILE__, __LINE__, source);
-
-	NSAppleScript *appleScript = [[[NSAppleScript alloc] initWithSource:source]
-		autorelease];
-
-	if(![appleScript compileAndReturnError:&errors]){
-		NSLog(@"%s:%d %@", __FILE__, __LINE__, errors);
-		return;
-	}
-
-	NSAppleEventDescriptor *result = [appleScript executeAndReturnError:&errors];
-	NSLog(@"%s:%d %@", __FILE__, __LINE__, result);
-	NSLog(@"%s:%d %@", __FILE__, __LINE__, errors);
-#endif
 
 	// extend lifetime
 	[suicideTimer setFireDate:[NSDate dateWithTimeIntervalSinceNow:lifetime]];
